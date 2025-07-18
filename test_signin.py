@@ -9,26 +9,35 @@ from selenium.webdriver.support import expected_conditions as EC
 @pytest.fixture
 def driver():
     options = Options()
-    # Do NOT use headless
     driver = webdriver.Chrome(options=options)
     yield driver
-    # driver.quit()  # Comment during test to keep browser open
+    # driver.quit()  # Keep open for debugging
 
 def test_valid_signin(driver):
     driver.get("https://console.upstash.com/auth/sign-in")
 
+    # Wait for email field and input
     email_input = WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.NAME, "email"))
     )
     email_input.send_keys("atulbootcoding26@gmail.com")
 
+    # Input password
     password_input = driver.find_element(By.NAME, "password")
     password_input.send_keys("Bootcoding12!@")
 
+    # Click continue
     driver.find_element(By.XPATH, "//button[contains(., 'Continue')]").click()
 
-    # Wait until dashboard header is visible
-    driver.get("https://console.upstash.com/redis?teamid=0")
+    # ✅ Wait for URL to change to dashboard
+    WebDriverWait(driver, 15).until(
+        lambda d: "redis?teamid=" in d.current_url
+    )
 
-    print("✅ Login successful — You should now see the dashboard.")
-    time.sleep(30)  # Pause so you can see the dashboard
+    # ✅ Optionally confirm with an element on dashboard
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.XPATH, "//button[contains(., 'Create Database')]"))
+    )
+
+    print("✅ Login successful — Dashboard loaded.")
+    time.sleep(10)
