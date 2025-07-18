@@ -47,6 +47,8 @@ def test_login_invalid(driver):
     # Wait until still on login page (invalid login)
     wait.until(EC.url_contains("sign-in"))
 
+    time.sleep(10)
+
     driver.save_screenshot("03_dashboard.png")
 
     # Optional: check error message (if any)
